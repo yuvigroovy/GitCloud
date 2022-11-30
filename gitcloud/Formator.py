@@ -29,7 +29,7 @@ class Formator:
         process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
         output, error = process.communicate()
 
-    def fragmentize(self, path: str,num_of_fregments: int, remain_fragment_size: float):
+    def fragmentize(self, path: str,num_of_fregments: int, remain_fragment_size: float, file_size: int):
         #make a folder for fragmented file: 
         folder_path = os.path.join(self.cloud_path,self.file_name)
         try:
@@ -41,7 +41,7 @@ class Formator:
 
             #create info file
             with open(os.path.join(folder_path,'info.txt'), 'w') as f:
-                f.write(f"n{num_of_fregments+1}t{extention}")
+                f.write(f"{num_of_fregments+1}\n{extention}\n{self.file_name}\n{file_size}")
             for i in range(num_of_fregments):
                 Formator.make_fragment(path,folder_path+'/'+str(i),i,Formator.max_fregment_size)
             Formator.make_fragment(path,folder_path+'/'+str(num_of_fregments) ,num_of_fregments,0)
@@ -51,9 +51,9 @@ class Formator:
         if(file_size > Formator.max_fregment_size):
             num_of_fragments = int(file_size / Formator.max_fregment_size)
             remain_fragment_size = file_size % Formator.max_fregment_size
-            Formator.fragmentize(self,path,num_of_fragments,0)
+            Formator.fragmentize(self, path,num_of_fragments,remain_fragment_size,file_size)
         else:
-            self.fragmentize(path,0,0)       
+            self.fragmentize(self, path,0,0,file_size)       
 
 #test
 
